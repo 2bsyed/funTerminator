@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hello World!</title>
+
+  </head>
+  <body>
+    <div id="app-container">
+      <header>
+        <h1>� Matrix Terminal <span id="emoji-title">💻🟢</span></h1>
+        <button id="settings-btn">⚙️</button>
+      </header>
+      <nav id="tab-bar">
+        <button class="tab active">Tab 1</button>
+        <button class="tab">+</button>
+      </nav>
+      <main id="main-content">
+        <aside id="file-browser">
+          <h2>📁 Files</h2>
+          <ul id="file-list">
+            <li>index.html</li>
+            <li>main.js</li>
+            <li>renderer.js</li>
+          </ul>
+        </aside>
+        <section id="terminal-area">
+          <div id="terminal-output">
+            <span class="matrix-emoji">🟢🟩🟢🟩🟢</span>
+            <div id="output-lines"></div>
+          </div>
+          <div id="terminal-input-row">
+            <input id="terminal-input" type="text" placeholder="Type a command..." />
+            <button id="run-cmd">▶️</button>
+          </div>
+          <div id="terminal-buttons">
+            <button id="new-btn">🆕 New</button>
+            <button id="save-btn">💾 Save</button>
+            <button id="exit-btn">❌ Exit</button>
+            <button id="back-btn">⬅️ Back</button>
+            <button id="forward-btn">➡️ Forward</button>
+          </div>
+        </section>
+      </main>
+      <div id="settings-modal" style="display:none;">
+        <h2>Settings</h2>
+        <label for="theme-color">Theme Color:
+          <input id="theme-color" type="color" value="#00ff00" />
+        </label>
+        <label for="font-size">Font Size:
+          <input id="font-size" type="range" min="12" max="28" value="16" />
+        </label>
+        <label for="bg-color">Background Color:
+          <input id="bg-color" type="color" value="#111111" />
+        </label>
+        <button id="close-settings">Close</button>
+      </div>
+    </div>
+  </body>
+</html>
