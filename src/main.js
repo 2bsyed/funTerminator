@@ -71,3 +71,22 @@ ipcMain.handle('run-command', async (event, cmd, cwd) => {
     });
   });
 });
+
+// IPC handler for reading files
+ipcMain.handle('read-file', async (event, filePath) => {
+  try {
+    return fs.readFileSync(filePath, 'utf8');
+  } catch (e) {
+    return '';
+  }
+});
+
+// IPC handler for writing files
+ipcMain.handle('write-file', async (event, filePath, content) => {
+  try {
+    fs.writeFileSync(filePath, content, 'utf8');
+    return 'Saved!';
+  } catch (e) {
+    return 'Error saving file: ' + e.message;
+  }
+});

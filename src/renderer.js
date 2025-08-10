@@ -26,7 +26,90 @@
  * ```
  */
 
+
 import './index.css';
+
+// Modal editor for nano
+let nanoModal = null;
+function openNanoEditor(filePath, initialContent = '') {
+	if (nanoModal) nanoModal.remove();
+	nanoModal = document.createElement('div');
+	nanoModal.style.position = 'fixed';
+	nanoModal.style.top = '50%';
+	nanoModal.style.left = '50%';
+	nanoModal.style.transform = 'translate(-50%, -50%)';
+	nanoModal.style.background = '#222';
+	nanoModal.style.border = '2px solid var(--theme-green)';
+	nanoModal.style.padding = '20px';
+	nanoModal.style.zIndex = '9999';
+	nanoModal.style.width = '400px';
+	nanoModal.style.boxShadow = '0 0 20px #00ff00';
+	nanoModal.innerHTML = `<h3 style='color:lime'>Nano Editor: ${filePath}</h3>`;
+	const textarea = document.createElement('textarea');
+	textarea.value = initialContent;
+	textarea.style.width = '100%';
+	textarea.style.height = '200px';
+	textarea.style.background = '#111';
+	textarea.style.color = '#0f0';
+	textarea.style.fontFamily = 'monospace';
+	nanoModal.appendChild(textarea);
+	const saveBtn = document.createElement('button');
+	saveBtn.textContent = '💾 Save';
+	saveBtn.style.marginTop = '10px';
+	saveBtn.onclick = async () => {
+		await window.api.writeFile(filePath, textarea.value);
+		addOutput(`Saved: ${filePath}`);
+		nanoModal.remove();
+		nanoModal = null;
+	};
+	nanoModal.appendChild(saveBtn);
+	// Add Run button for .sh files
+	if (filePath.endsWith('.sh')) {
+		const runBtn = document.createElement('button');
+		runBtn.textContent = '▶️ Run';
+		runBtn.style.marginLeft = '10px';
+		runBtn.onclick = async () => {
+			await window.api.writeFile(filePath, textarea.value); // Save before running
+			nanoModal.remove();
+			nanoModal = null;
+			addOutput(`Running: ${filePath}`);
+			const result = await window.api.runCommand(`bash ${filePath}`, currentDir);
+			addOutput(result);
+		};
+		nanoModal.appendChild(runBtn);
+	}
+	const closeBtn = document.createElement('button');
+	closeBtn.textContent = '❌ Close';
+	closeBtn.style.marginLeft = '10px';
+	closeBtn.onclick = () => {
+		nanoModal.remove();
+		nanoModal = null;
+	};
+	nanoModal.appendChild(closeBtn);
+	document.body.appendChild(nanoModal);
+}
+
+// Patch handleCommand to support nano and bash
+const originalHandleCommand = handleCommand;
+handleCommand = async function(cmd) {
+	const nanoMatch = cmd.match(/^nano\s+(.+)$/);
+	const bashMatch = cmd.match(/^bash\s+(.+)$/);
+	if (nanoMatch) {
+		const filePath = nanoMatch[1].trim();
+		addOutput(`Opening nano editor for: ${filePath}`);
+		const content = await window.api.readFile(filePath);
+		openNanoEditor(filePath, content);
+		return;
+	}
+	if (bashMatch) {
+		const filePath = bashMatch[1].trim();
+		addOutput(`Running bash file: ${filePath}`);
+		const result = await window.api.runCommand(`bash ${filePath}`, currentDir);
+		addOutput(result);
+		return;
+	}
+	await originalHandleCommand(cmd);
+}
 
 
 // UI Elements
