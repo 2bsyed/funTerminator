@@ -214,6 +214,15 @@ function addOutput(text) {
 renderTabs();
 renderHistory();
 
+// Refresh button for file manager
+const refreshFilesBtn = document.getElementById('refresh-files');
+if (refreshFilesBtn) {
+	refreshFilesBtn.onclick = () => {
+		renderFileList();
+		addOutput('File list refreshed');
+	};
+}
+
 // Terminal command logic
 // (already defined above with tab support)
 
@@ -380,9 +389,9 @@ addOutput('Welcome to Matrix Terminal! Type "bore bore bore" for a surprise 🐍
 			files.forEach(file => {
 				const li = document.createElement('li');
 				li.textContent = file;
-				li.onclick = () => {
+				li.onclick = async () => {
 					const newPath = currentDir === '.' ? file : currentDir + '/' + file;
-					window.api.listFiles(newPath).then(subFiles => {
+					window.api.listFiles(newPath).then(async subFiles => {
 						if (subFiles.length > 0) {
 							// It's a folder
 							currentDir = newPath;
@@ -392,7 +401,9 @@ addOutput('Welcome to Matrix Terminal! Type "bore bore bore" for a surprise 🐍
 							renderFileList();
 							addOutput(`Changed directory to: ${currentDir}`);
 						} else {
-							addOutput(`Opened file: ${file}`);
+							// Open file in nano editor
+							const content = await window.api.readFile(newPath);
+							openNanoEditor(newPath, content);
 						}
 					});
 				};
